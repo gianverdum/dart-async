@@ -1,28 +1,31 @@
 import 'dart:io';
 
-import 'package:assincronismo/models/account.dart';
 import 'package:assincronismo/services/account_service.dart';
 import 'package:http/http.dart';
+
+import '../models/account.dart';
 
 class AccountScreen {
   final AccountService _accountService = AccountService();
 
   void initializeStream() {
-    _accountService.streamInfos.listen((event) {
-      print(event);
-    });
+    _accountService.streamInfos.listen(
+      (event) {
+        print(event);
+      },
+    );
   }
 
   void runChatBot() async {
-    print("Bom dia! Eu sou C3PO, assistente do Banco d'Ouro");
+    print("Bom dia! Eu sou o Lewis, assistente do Banco d'Ouro!");
     print("Que bom te ter aqui com a gente.\n");
 
     bool isRunning = true;
     while (isRunning) {
       print("Como eu posso te ajudar? (digite o número desejado)");
-      print("1 - 👀Ver todas as suas contas.");
-      print("2 - ➕Adicionar nova conta.");
-      print("3 - 🚪Sair\n");
+      print("1 - 👀 Ver todas sua contas.");
+      print("2 - ➕ Adicionar nova conta.");
+      print("3 - Sair\n");
 
       String? input = stdin.readLineSync();
 
@@ -46,7 +49,7 @@ class AccountScreen {
             }
           default:
             {
-              print("Opção inválida. Tente novamente.");
+              print("Não entendi. Tente novamente.");
             }
         }
       }
@@ -56,38 +59,35 @@ class AccountScreen {
   Future<void> _getAllAccounts() async {
     try {
       List<Account> listAccounts = await _accountService.getAll();
-      for (Account account in listAccounts) {
-        print(account);
-      }
-    } on ClientException catch (error, stackTrace) {
+      print(listAccounts);
+    } on ClientException catch (clientException) {
       print("Não foi possível alcançar o servidor.");
       print("Tente novamente mais tarde.");
-      print("Erro: ${error.message}");
-      print("Tipo: ${error.runtimeType}");
-      print("stackTrace: $stackTrace");
-    } on Exception catch (error, stackTrace) {
-      print("Não foi possível recuperar os dados da conta.");
+      print(clientException.message);
+      print(clientException.uri);
+    } on Exception {
+      print("Não consegui recuperar os dados da conta.");
       print("Tente novamente mais tarde.");
-      print("Tipo: ${error.runtimeType}");
-      print("stackTrace: $stackTrace");
     } finally {
       print("${DateTime.now()} | Ocorreu uma tentativa de consulta.");
+      // Aqui vai rodar antes de fechar.
     }
+    // Aqui não vai rodar antes de fechar.
   }
 
   Future<void> _addExampleAccount() async {
     try {
       Account example = Account(
-        id: "ID556",
-        name: "Ocean",
-        lastName: "Digital",
-        balance: 255.45,
+        id: "ID555",
+        name: "Haley",
+        lastName: "Chirívia",
+        balance: 8001,
         accountType: "Brigadeiro",
       );
 
       await _accountService.addAccount(example);
-    } on Exception catch (e) {
-      print("Erro ao adicionar $e");
+    } on Exception {
+      print("Ocorreu um problema ao tentar adicionar.");
     }
   }
 }

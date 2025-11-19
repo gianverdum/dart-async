@@ -7,7 +7,6 @@ class Transaction {
   DateTime date;
   double amount;
   double taxes;
-
   Transaction({
     required this.id,
     required this.senderAccountId,
@@ -16,33 +15,6 @@ class Transaction {
     required this.amount,
     required this.taxes,
   });
-
-  factory Transaction.fromMap(Map<String, dynamic> map) {
-    return Transaction(
-      id: map['id'] as String,
-      senderAccountId: map['senderAccountId'] as String,
-      receiverAccountId: map['receiverAccountId'] as String,
-      date: DateTime.fromMillisecondsSinceEpoch(map['date'] as int),
-      amount: map['amount'] as double,
-      taxes: map['taxes'] as double,
-    );
-  }
-
-  factory Transaction.fromJson(String source) =>
-      Transaction.fromMap(jsonDecode(source));
-
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      "id": id,
-      "senderAccountId": senderAccountId,
-      "receiverAccountId": receiverAccountId,
-      "date": date,
-      "amount": amount,
-      "taxes": taxes,
-    };
-  }
-
-  String toJson() => jsonEncode(toMap());
 
   Transaction copyWith({
     String? id,
@@ -62,9 +34,48 @@ class Transaction {
     );
   }
 
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'senderAccountId': senderAccountId,
+      'receiverAccountId': receiverAccountId,
+      'date': date.millisecondsSinceEpoch,
+      'amount': amount,
+      'taxes': taxes,
+    };
+  }
+
+  factory Transaction.fromMap(Map<String, dynamic> map) {
+    return Transaction(
+      id: (map['id'] != null) ? map['id'] as String : '',
+      senderAccountId: (map['senderAccountId'] != null) ? map['senderAccountId'] as String : '',
+      receiverAccountId: (map['receiverAccountId'] != null) ? map['receiverAccountId'] as String : '',
+      date: (map['date'] != null) ? DateTime.fromMillisecondsSinceEpoch(map['date'] as int) : DateTime.now(),
+      amount: (map['amount'] != null) ? map['amount'] as double : 0.0,
+      taxes: (map['taxes'] != null) ? map['taxes'] as double : 0.0,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Transaction.fromJson(String source) =>
+      Transaction.fromMap(json.decode(source) as Map<String, dynamic>);
+
   @override
   String toString() {
-    return 'Transação $id\nRemetente $senderAccountId\nDestinatário $receiverAccountId\nData $date\nValor $amount\nTaxa $taxes';
+    return 'Transaction(id: $id, senderAccountId: $senderAccountId, receiverAccountId: $receiverAccountId, date: $date, amount: $amount, taxes: $taxes)';
+  }
+
+  @override
+  bool operator ==(covariant Transaction other) {
+    if (identical(this, other)) return true;
+
+    return other.id == id &&
+        other.senderAccountId == senderAccountId &&
+        other.receiverAccountId == receiverAccountId &&
+        other.date == date &&
+        other.amount == amount &&
+        other.taxes == taxes;
   }
 
   @override
@@ -75,18 +86,5 @@ class Transaction {
         date.hashCode ^
         amount.hashCode ^
         taxes.hashCode;
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Transaction &&
-        other.id == id &&
-        other.senderAccountId == senderAccountId &&
-        other.receiverAccountId == receiverAccountId &&
-        other.date == date &&
-        other.amount == amount &&
-        other.taxes == taxes;
   }
 }

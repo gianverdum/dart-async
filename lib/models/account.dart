@@ -17,28 +17,24 @@ class Account {
 
   factory Account.fromMap(Map<String, dynamic> map) {
     return Account(
-      id: map['id'],
-      name: map['name'],
-      lastName: map['lastName'],
-      balance: (map['balance'] as num).toDouble(),
-      accountType: (map['accountType'] != null) ? map['accountType'] as String : null,
+      id: map['id'] as String,
+      name: map['name'] as String,
+      lastName: map['lastName'] as String,
+      balance: map['balance'] as double,
+      accountType:
+          (map['accountType'] != null) ? map['accountType'] as String : null,
     );
   }
 
-  factory Account.fromJson(String source) =>
-      Account.fromMap(jsonDecode(source));
-
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      "id": id,
-      "name": name,
-      "lastName": lastName,
-      "balance": balance,
-      "accountType": accountType,
+      'id': id,
+      'name': name,
+      'lastName': lastName,
+      'balance': balance,
+      'accountType': accountType,
     };
   }
-
-  String toJson() => jsonEncode(toMap());
 
   Account copyWith({
     String? id,
@@ -56,29 +52,28 @@ class Account {
     );
   }
 
+  String toJson() => json.encode(toMap());
+
+  factory Account.fromJson(String source) =>
+      Account.fromMap(json.decode(source) as Map<String, dynamic>);
+
   @override
   String toString() {
-    return 'Conta $id\n$name $lastName\nSaldo: $balance\n,';
+    return '\nConta $id\n$name $lastName\nSaldo: $balance\n';
+  }
+
+  @override
+  bool operator ==(covariant Account other) {
+    if (identical(this, other)) return true;
+
+    return other.id == id &&
+        other.name == name &&
+        other.lastName == lastName &&
+        other.balance == balance;
   }
 
   @override
   int get hashCode {
-    return id.hashCode ^
-        name.hashCode ^
-        lastName.hashCode ^
-        balance.hashCode ^
-        accountType.hashCode;
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Account &&
-        other.id == id &&
-        other.name == name &&
-        other.lastName == lastName &&
-        other.balance == balance &&
-        other.accountType == accountType;
+    return id.hashCode ^ name.hashCode ^ lastName.hashCode ^ balance.hashCode;
   }
 }

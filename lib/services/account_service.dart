@@ -8,25 +8,26 @@ import 'dart:convert';
 class AccountService {
   final StreamController<String> _streamController = StreamController<String>();
   Stream<String> get streamInfos => _streamController.stream;
+
   String url = "https://api.github.com/gists/1180b5beab545d133091b73519770b01";
 
   Future<List<Account>> getAll() async {
-      Response response = await get(Uri.parse(url));
-      _streamController.add("${DateTime.now()} | Requisição de leitura.");
-      Map<String, dynamic> mapResponse = json.decode(response.body);
-      List<dynamic> listDynamic = json.decode(
-        mapResponse["files"]["accounts.json"]["content"],
-      );
+    Response response = await get(Uri.parse(url));
+    _streamController.add("${DateTime.now()} | Requisição de leitura.");
 
-      List<Account> listAccounts = [];
+    Map<String, dynamic> mapResponse = json.decode(response.body);
+    List<dynamic> listDynamic =
+        json.decode(mapResponse["files"]["accounts.json"]["content"]);
 
-      for (dynamic dyn in listDynamic) {
-        Map<String, dynamic> mapAccount = dyn as Map<String, dynamic>;
-        Account account = Account.fromMap(mapAccount);
-        listAccounts.add(account);
-      }
+    List<Account> listAccounts = [];
 
-      return listAccounts;
+    for (dynamic dyn in listDynamic) {
+      Map<String, dynamic> mapAccount = dyn as Map<String, dynamic>;
+      Account account = Account.fromMap(mapAccount);
+      listAccounts.add(account);
+    }
+
+    return listAccounts;
   }
 
   Future<void> addAccount(Account account) async {
@@ -41,7 +42,7 @@ class AccountService {
       listContent.add(account.toMap());
     }
 
-    String content = JsonEncoder.withIndent('  ').convert(listContent);
+    String content = json.encode(listContent);
 
     Response response = await post(
       Uri.parse(url),
@@ -50,19 +51,19 @@ class AccountService {
         "description": "account.json",
         "public": true,
         "files": {
-          "accounts.json": {"content": content},
-        },
+          "accounts.json": {
+            "content": content,
+          }
+        }
       }),
     );
 
     if (response.statusCode.toString()[0] == "2") {
       _streamController.add(
-        "${DateTime.now()} | Requisição de adição bem sucedida ($accountName).",
-      );
+          "${DateTime.now()} | Requisição adição bem sucedida ($accountName).");
     } else {
-      _streamController.add(
-        "${DateTime.now()} | Requisição de adição falhou ($accountName).",
-      );
+      _streamController
+          .add("${DateTime.now()} | Requisição falhou ($accountName).");
     }
   }
 }
